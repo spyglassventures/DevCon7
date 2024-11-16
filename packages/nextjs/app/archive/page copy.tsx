@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import DisplayEthImage from "./display_eth_image";
 import { SmartAccount } from "../components/smartaccount/SmartAccount";
-
-
-
 
 const Home: React.FC = () => {
   const { address: connectedAddress } = useAccount();
@@ -16,19 +13,9 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [ethNames, setEthNames] = useState<string[]>([]);
   const [selectedEthName, setSelectedEthName] = useState<string | null>(null);
-  const smartAccountRef = useRef(null);
-
-  // const handleButtonClick = () => {
-  //   setIsContractCreated(true);
-  //   if (smartAccountRef.current) {
-  //     smartAccountRef.current.handleCreateSmartAccount();
-  //   }
-  // };
 
   // Hardcoded address for debugging
   const debugAddress = "0x0bac814ad046619d4d9783cc7d1f669d1feb4a39";
-  const [isDomainAssigned, setIsDomainAssigned] = useState(false);
-  const [isContractCreated, setIsContractCreated] = useState(false);
 
   const extractEthNames = (text: string) => {
     const regex = /\b[a-zA-Z0-9-]+\.eth\b/g;
@@ -105,9 +92,6 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        
-        
-
         <div className="flex flex-col items-center w-full mt-8 px-8 py-12 bg-gray-900 text-green-400">
           <div className="w-full max-w-xl">
             <button
@@ -150,18 +134,13 @@ const Home: React.FC = () => {
             <div className="mt-6 w-full max-w-xl">
               <h3 className="text-lg font-bold mb-4">Great. Now lets choose your free .eth Name</h3>
               <p className="text-s first-letter: mb-6">
-            Please select which username you like best.
+            Please select which name you like best.
           </p>
               <div className="flex flex-wrap gap-2">
                 {ethNames.map((name, index) => (
                   <button
                     key={index}
-                    onClick={() => 
-                    {
-                      setSelectedEthName(name);
-                      setIsDomainAssigned(true);
-                    }
-                    } // and 
+                    onClick={() => setSelectedEthName(name)}
                     className="px-4 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-mono"
                   >
                     {name}
@@ -189,47 +168,45 @@ const Home: React.FC = () => {
                       className="w-full p-2 border border-green-400 bg-gray-800 text-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono mb-4"
                       required
                     />
-                    <div>
-      <h1>Create recovery wallet (Registrar)</h1>
-      <SmartAccount /> {/* The button from SmartAccount will be rendered here */}
-    </div>
-                   
-                    
+                    <button
+                      type="submit"
+                      className="w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
+                    >
+                      Assign .eth Domain and Create Smart Contract Account
+                    </button>
                   </form>
 
-
-                  
-                  <div className={`mt-6 ${isContractCreated ? "" : "opacity-50 pointer-events-none"}`}>
-                    <h3 className="text-lg font-bold mb-4">Optional: Update your profile with a cool avatar image</h3>
+                  <div className={`mt-6 ${response ? "" : "opacity-50 pointer-events-none"}`}>
+                    <h3 className="text-lg font-bold mb-4">Step 3: Set Your Profile Picture</h3>
                     <button
                       onClick={() => alert('Image generation initiated.')}
                       className="w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
-                      disabled={!isContractCreated}
+                      disabled={!response}
                     >
                       Generate Profile Picture
                     </button>
                     <div className="mt-4 flex justify-between">
                       <button
                         className="w-48 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
-                        disabled={!isContractCreated}
+                        disabled={!response}
                       >
                         Select as Profile Picture
                       </button>
                       <button
                         className="w-48 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
-                        disabled={!isContractCreated}
+                        disabled={!response}
                       >
                         Upload Own File
                       </button>
                     </div>
                   </div>
 
-                  {isContractCreated && (
+                  {response && (
                     <div className="mt-6 p-4 bg-gray-800 text-green-400 border border-green-500 rounded-lg font-mono">
                       <h3 className="font-bold mb-2 text-green-300">Success!</h3>
                       <p>ENS Name: {selectedEthName}</p>
                       <p>Account Address: 0x123...456</p>
-                      <p>Recovery Email: {selectedEthName}</p>
+                      <p>Recovery Email: {response}</p>
                       <p>Profile Picture: [Generated or Uploaded Image Here]</p>
                     </div>
                   )}

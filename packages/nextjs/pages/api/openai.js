@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(400).send({ message: "Prompt is required" });
   }
 
-  const customMessage = "Characterize the user based on the transactions counterparts, value and recency of trades. Then come up with interesting, yet descriptive .eth address that suit the user and would catch his attention, making him interested in registering the .ens address.";
+  const customMessage = "Characterize the user based on the transactions counterparts, value and recency of trades. Then come up with interesting, yet descriptive .eth address that suit the user and would catch his attention, making him interested in registering the .ens address. Show at  least 3 .eth addresses";
 
   const combinedPrompt = `${customMessage}\n\n${prompt}`;
 

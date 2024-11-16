@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import DisplayEthImage from "./display_eth_image";
 import { SmartAccount } from "../components/smartaccount/SmartAccount";
-
-
-
 
 const Home: React.FC = () => {
   const { address: connectedAddress } = useAccount();
@@ -16,14 +13,6 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [ethNames, setEthNames] = useState<string[]>([]);
   const [selectedEthName, setSelectedEthName] = useState<string | null>(null);
-  const smartAccountRef = useRef(null);
-
-  // const handleButtonClick = () => {
-  //   setIsContractCreated(true);
-  //   if (smartAccountRef.current) {
-  //     smartAccountRef.current.handleCreateSmartAccount();
-  //   }
-  // };
 
   // Hardcoded address for debugging
   const debugAddress = "0x0bac814ad046619d4d9783cc7d1f669d1feb4a39";
@@ -104,9 +93,6 @@ const Home: React.FC = () => {
             Why? In case you loose access to your wallet, you can still recover your username
           </p>
         </div>
-
-        
-        
 
         <div className="flex flex-col items-center w-full mt-8 px-8 py-12 bg-gray-900 text-green-400">
           <div className="w-full max-w-xl">
@@ -189,12 +175,18 @@ const Home: React.FC = () => {
                       className="w-full p-2 border border-green-400 bg-gray-800 text-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono mb-4"
                       required
                     />
-                    <div>
-      <h1>Create recovery wallet (Registrar)</h1>
-      <SmartAccount /> {/* The button from SmartAccount will be rendered here */}
-    </div>
-                   
-                    
+                    <button
+                      type="submit"
+                      onClick={() => 
+                        {
+                         
+                          setIsContractCreated(true);
+                        }
+                        } // and 
+                      className="w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
+                    >
+                      Assign .eth Domain and Create Smart Contract Account
+                    </button>
                   </form>
 
 
