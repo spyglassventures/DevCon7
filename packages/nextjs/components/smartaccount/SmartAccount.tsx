@@ -64,7 +64,7 @@ export const SmartAccount: React.FC = () => {
   onClick={handleCreateSmartAccount}
   className="w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
 >
-  Assign .eth Domain and Create Smart Contract Account
+  Create Recovery wallet 
 </button>
 
       {smartAccountAddress && (

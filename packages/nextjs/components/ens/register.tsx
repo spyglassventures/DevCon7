@@ -1,28 +1,44 @@
-import React, { useState } from "react";
-import NameStone, { AuthenticationError, NetworkError, TextRecords } from "namestone-sdk";
+import React, { useEffect, useState } from "react";
 
-const NameStoneComponent: React.FC = () => {
+interface NameStoneComponentProps {
+  selectedEthName: string | null; // Selected .docdialog.eth name
+  connectedAddress: string | undefined; // Connected wallet address
+}
+
+const NameStoneComponent: React.FC<NameStoneComponentProps> = ({
+  selectedEthName,
+  connectedAddress,
+}) => {
   const [domain, setDomainInput] = useState(""); // ENS domain input
   const [address, setAddressInput] = useState(""); // Blockchain address input
   const [message, setMessage] = useState(""); // Feedback message to the user
 
   // Load the API key from environment variables
   const apiKey = process.env.NEXT_PUBLIC_NAMESTONE_API_KEY;
-  
 
   if (!apiKey) {
     console.error("API key is missing. Please set NEXT_PUBLIC_NAMESTONE_API_KEY in .env.local");
     return <p>API key is missing.</p>;
   }
 
+  // Update domain and address when props change
+  useEffect(() => {
+    if (selectedEthName) {
+      setDomainInput(selectedEthName);
+    }
+    if (connectedAddress) {
+      setAddressInput(connectedAddress);
+    }
+  }, [selectedEthName, connectedAddress]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!domain || !address) {
       setMessage("Domain and address are required.");
       return;
     }
-  
+
     try {
       const response = await fetch("/api/proxy-namestone", {
         method: "POST",
@@ -43,14 +59,14 @@ const NameStoneComponent: React.FC = () => {
           },
         }),
       });
-  
+
       if (!response.ok) {
         const error = await response.json();
         console.error("Error response:", error);
         setMessage(`Error: ${error.error || "An error occurred"}`);
         return;
       }
-  
+
       const data = await response.json();
       setMessage(`Domain set successfully: ${JSON.stringify(data)}`);
     } catch (error) {
@@ -58,8 +74,6 @@ const NameStoneComponent: React.FC = () => {
       setMessage(`An unexpected error occurred: ${error.message}`);
     }
   };
-  
-  
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
@@ -89,11 +103,14 @@ const NameStoneComponent: React.FC = () => {
             />
           </label>
         </div>
-        <div style={{ marginTop: "20px" }}>
-          <button type="submit" style={{ padding: "10px 20px", cursor: "pointer" }}>
-            Set Domain
-          </button>
-        </div>
+       <div className="mt-5">
+        <button
+          type="submit"
+          className="w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold font-mono"
+        >
+          Set Domain
+        </button>
+      </div>
       </form>
       {message && (
         <div style={{ marginTop: "20px", color: message.includes("successfully") ? "green" : "red" }}>
@@ -105,3 +122,4 @@ const NameStoneComponent: React.FC = () => {
 };
 
 export default NameStoneComponent;
+

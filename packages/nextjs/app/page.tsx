@@ -95,19 +95,18 @@ const Home: React.FC = () => {
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5 text-center bg-gradient-to-r from-blue-500 to-green-400 text-white py-10 rounded-lg shadow-lg">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Klong</h1>
+      <div className="px-5 text-center bg-gradient-to-r from-blue-500 to-green-400 text-white py-10 rounded-lg shadow-lg">
+          <h1 className="text-4xl font-bold mb-4">See past transactions and claim a free username </h1>
           <p className="text-lg mb-6">
-            See past transactions and claim a free username  (ENS address) and add your email to complete your profile.
+          Add your email and a choose a avatar to complete your DocDialog.eth profile.
           </p>
           <p className="text-m first-letter: mb-6">
-            Why? In case you loose access to your wallet, you can still recover your username
+            Why? In case you lose access to your wallet, you can still recover
+            your username.
           </p>
         </div>
 
-        <div>
-          <NameStoneComponent />
-        </div>
+       
 
         
         
@@ -152,26 +151,25 @@ const Home: React.FC = () => {
 
 {ethNames.length > 0 && (
             <div className="mt-6 w-full max-w-xl">
-              <h3 className="text-lg font-bold mb-4">Great. Now lets choose your free .eth Name</h3>
+              <h3 className="text-lg font-bold mb-4">Great. Now lets choose your free DocDialog.eth Name</h3>
               <p className="text-s first-letter: mb-6">
             Please select which username you like best.
           </p>
-              <div className="flex flex-wrap gap-2">
-                {ethNames.map((name, index) => (
-                  <button
-                    key={index}
-                    onClick={() => 
-                    {
-                      setSelectedEthName(name);
-                      setIsDomainAssigned(true);
-                    }
-                    } // and 
-                    className="px-4 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-mono"
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
+          <div className="flex flex-wrap gap-2">
+  {ethNames.map((name, index) => (
+    <button
+      key={index}
+      onClick={() => {
+        setSelectedEthName(name.replace(/\.eth$/, ".docdialog.eth")); // Updated name with .docdialog.eth
+        setIsDomainAssigned(true);
+      }}
+      className="px-4 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-mono"
+    >
+      {name.replace(/\.eth$/, ".docdialog.eth")} {/* Replace in display */}
+    </button>
+  ))}
+</div>
+
 
               {selectedEthName && (
                 <div className="mt-6">
@@ -196,6 +194,12 @@ const Home: React.FC = () => {
                     <div>
       <h1>Create recovery wallet (Registrar)</h1>
       <SmartAccount /> {/* The button from SmartAccount will be rendered here */}
+
+      <NameStoneComponent
+  selectedEthName={selectedEthName || ""}
+  connectedAddress={connectedAddress}
+/>
+        
     </div>
                    
                     

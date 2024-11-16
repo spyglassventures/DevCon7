@@ -19,10 +19,9 @@ const Home: React.FC = () => {
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="px-5 text-center bg-gradient-to-r from-blue-500 to-green-400 text-white py-10 rounded-lg shadow-lg">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Klong</h1>
+          <h1 className="text-4xl font-bold mb-4">See past transactions and claim a free username </h1>
           <p className="text-lg mb-6">
-            See past transactions and claim a free username (ENS address) and
-            add your email to complete your profile.
+          Add your email and a avator to complete your DocDialog.eth profile.
           </p>
           <p className="text-m first-letter: mb-6">
             Why? In case you lose access to your wallet, you can still recover
