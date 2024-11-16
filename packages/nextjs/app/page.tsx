@@ -6,7 +6,7 @@ import { Address } from "~~/components/scaffold-eth";
 import DisplayEthImage from "./display_eth_image";
 import { SmartAccount } from "../components/smartaccount/SmartAccount";
 
-
+import NameStoneComponent from "../components/ens/register";
 
 
 const Home: React.FC = () => {
@@ -103,6 +103,10 @@ const Home: React.FC = () => {
           <p className="text-m first-letter: mb-6">
             Why? In case you loose access to your wallet, you can still recover your username
           </p>
+        </div>
+
+        <div>
+          <NameStoneComponent />
         </div>
 
         

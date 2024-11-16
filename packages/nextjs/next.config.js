@@ -14,6 +14,14 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/proxy/:path*",
+        destination: "https://namestone.xyz/:path*", // Proxy to the external API
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
