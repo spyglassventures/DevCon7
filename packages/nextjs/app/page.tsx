@@ -1,13 +1,82 @@
 "use client";
 
-import Link from "next/link";
-import type { NextPage } from "next";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Address } from "~~/components/scaffold-eth";
+import DisplayEthImage from "./display_eth_image";
 
-const Home: NextPage = () => {
+const Home: React.FC = () => {
   const { address: connectedAddress } = useAccount();
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [ethNames, setEthNames] = useState<string[]>([]);
+  const [selectedEthName, setSelectedEthName] = useState<string | null>(null);
+
+  // Hardcoded address for debugging
+  const debugAddress = "0x0bac814ad046619d4d9783cc7d1f669d1feb4a39";
+
+  const extractEthNames = (text: string) => {
+    const regex = /\b[a-zA-Z0-9-]+\.eth\b/g;
+    const matches = text.match(regex);
+    return matches ? Array.from(new Set(matches)) : [];
+  };
+
+  const fetchEtherscanResponse = async () => {
+    try {
+      const res = await fetch(
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${debugAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY}`
+      );
+      const data = await res.json();
+      if (data.status === "1" && Array.isArray(data.result)) {
+        const reducedData = data.result.slice(0, 50).map(tx => ({
+          timeStamp: tx.timeStamp,
+          from: tx.from,
+          to: tx.to,
+          value: tx.value,
+          contractAddress: tx.contractAddress
+        }));
+        const output = JSON.stringify(reducedData, null, 2);
+        setPrompt(output);
+        setEthNames(extractEthNames(output));
+      } else {
+        setPrompt("No transactions found or invalid response from Etherscan.");
+        setEthNames([]);
+      }
+    } catch (error) {
+      setPrompt(`Error fetching transactions: ${error.message}`);
+      setEthNames([]);
+    }
+  };
+
+  const handlePromptSubmit = async () => {
+    if (!prompt.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await res.json();
+      if (data.answer) {
+        setResponse(data.answer);
+        setEthNames(extractEthNames(data.answer));
+      } else {
+        setResponse("No response received from the API.");
+        setEthNames([]);
+      }
+    } catch (error) {
+      setResponse("An error occurred. Please try again later.");
+      setEthNames([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -15,54 +84,69 @@ const Home: NextPage = () => {
         <div className="px-5">
           <h1 className="text-center">
             <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
+            <span className="block text-4xl font-bold">Klong</span>
           </h1>
           <div className="flex justify-center items-center space-x-2 flex-col sm:flex-row">
             <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
+            <Address address={debugAddress} />
           </div>
-
           <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
+            Get started by entering your wallet below.
           </p>
         </div>
 
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
+        <div className="flex flex-col items-center w-full mt-16 px-8 py-12 bg-gray-900 text-green-400">
+          <div className="w-full max-w-xl">
+            <button
+              onClick={fetchEtherscanResponse}
+              className="mb-4 w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold uppercase font-mono"
+            >
+              Load Transactions to Prompt
+            </button>
+            <textarea
+              className="w-full p-4 border border-green-400 bg-gray-800 text-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+              rows={8}
+              placeholder="> Enter your prompt here..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+            <button
+              onClick={handlePromptSubmit}
+              className="mt-4 w-full py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-bold uppercase font-mono"
+              disabled={loading}
+            >
+              {loading ? "Accessing..." : "Deploy Prompt"}
+            </button>
           </div>
+          {response && (
+            <div className="mt-6 w-full max-w-xl p-4 bg-gray-800 text-green-400 border border-green-500 rounded-lg font-mono max-h-96 overflow-y-auto">
+              <h3 className="font-bold mb-2 text-green-300">[Response]</h3>
+              <p>{response}</p>
+            </div>
+          )}
+
+          {ethNames.length > 0 && (
+            <div className="mt-6 w-full max-w-xl">
+              <h3 className="text-lg font-bold mb-4">Get .eth Name and mint Klong</h3>
+              <div className="flex flex-wrap gap-2">
+                {ethNames.map((name, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedEthName(name)}
+                    className="px-4 py-2 bg-gray-800 text-green-400 rounded-lg hover:bg-green-500 hover:text-gray-900 font-mono"
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedEthName && (
+            <div className="mt-8">
+              <DisplayEthImage ethName={selectedEthName} />
+            </div>
+          )}
         </div>
       </div>
     </>
